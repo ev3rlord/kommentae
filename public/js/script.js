@@ -263,6 +263,8 @@ const App = (function() {
     if (logout) logout.onclick = () => User.logout();
 ///////////////////////////////////////////////////////////////////////////// Comment {}
     const Comment = {
+      images: '',
+
       time: function(timestamp) {
         let time;
 
@@ -277,6 +279,15 @@ const App = (function() {
 
       component: function(cid, username, message, posted, secret) {
         let time = Comment.time(posted);
+
+        message = message.replace(/&lt;b&gt;(.*)&lt;\/b&gt;/g, '<b>$1</b>');
+        message = message.replace(/&lt;i&gt;(.*)&lt;\/i&gt;/g, '<b>$1</b>');
+        message = message.replace(/&lt;size=([\d\.]+)&gt;(.*)&lt;\/size&gt;/g, function(_, size, content) {
+          if (size >= 0.85 && size <= 2.25) return `<span style="font-size: ${size}rem">${content}</span>`;
+        });
+        message = message.replace(/&lt;color=([\w\s]+)&gt;(.*)&lt;\/color&gt;/g, '<span style="color: $1">$2</span>');
+        message = message.replace(/&lt;image=(https:\/\/[\w\.\/\-\%]*jpg)&gt;(.*)&lt;\/image&gt;/g, '<img class="km-image" src="$1"> $2');
+
 
         return `
           <section class="km-block km-comment__block" data-postid="${cid}">
@@ -311,9 +322,23 @@ const App = (function() {
       }
     }; // End of Reply {}
 ///////////////////////////////////////////////////////////////////////////// Reload {}
+    const modal = css('.km-modal') || false;
     let kmTimestamps = css('.km-timestamp', true) || false;
 
     const Reload = {
+      images: function() {
+        if (modal) {
+          Comment.images = css('.km-image', true) || false;
+          Array.prototype.slice.call(Comment.images).map(image => {
+            image.onclick = function () {
+              console.log('Clicked');
+              modal.style.display = 'flex';
+              modal.children[1].src = this.src;
+            };
+          })
+        }
+      },
+
       comments: function(display) {
         Response.http(function(response) {
           if(response.ready) {
@@ -326,6 +351,8 @@ const App = (function() {
                 response.data[i].secret
               ));
             }
+
+            Reload.images();
           } else if(logout) logout.click();
         }, 'get', config.root + '/api/comment?comments=all&ssid=' + Storage.get().ssid);
       },
@@ -415,6 +442,7 @@ const App = (function() {
 
               kmCommentTextarea.value = '';
               kmCommentFormAnimation(kmCommentTextarea);
+              Reload.images();
             } else console.log('Error occured.');
           }, 'post', config.root + '/api/comment', 'ssid=' + ssid + '&comment=' + kmCommentTextarea.value)
         }
@@ -429,6 +457,11 @@ const App = (function() {
       // Load comments
       Reload.comments(kmCommentsDisplay);
       Reload.time();
+      //////////////////////////////////////////////////////////////////// Modal
+      const kmModalClose = css('.km-modal__close') || false;
+      if(kmModalClose) {
+        kmModalClose.onclick = () => modal.style.display = 'none';
+      }
     } // end of KOMMENTA
   };
 

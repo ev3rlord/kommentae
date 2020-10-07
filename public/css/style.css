@@ -264,6 +264,45 @@ button.user-form__login-btn {
   margin: 10px auto;
 }
 
+.km-modal {
+  position: fixed;
+  z-index: 9000;
+  width: 100%;
+  height: 100vh;
+  top: 0;
+  left: 0;
+  background-color: rgba(0,0,0,0.95);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  user-select: none;
+}
+
+.km-modal__close {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 2rem;
+  color: #fff;
+  cursor: pointer;
+  user-select: none;
+}
+
+.km-modal img {
+  animation-name: zoom;
+  animation-duration: 0.5s;
+}
+
+@keyframes zoom {
+  0% {
+    transform: scale(0);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
 .km-comment {
   margin-bottom: 15px;
   overflow: hidden;
@@ -340,6 +379,11 @@ button.km-comment__cancel {
   position: relative;
   font-size: 1rem;
   font-family: var(--main-family);
+}
+
+.km-block img {
+  max-width: 100%;
+  cursor: pointer;
 }
 
 .km-timestamp {

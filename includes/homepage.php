@@ -6,6 +6,10 @@
       </div>
 
       <div class="kommenta">
+        <div class="km-modal">
+          <div class="km-modal__close">&times;</div>
+          <img>
+        </div>
         <div class="km-comment">
           <textarea class="km-textarea km-comment__textarea" spellcheck="false"></textarea>
           <div class="km-comment-textarea--shade"></div>
