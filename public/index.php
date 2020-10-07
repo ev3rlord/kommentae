@@ -43,7 +43,7 @@
     <div class="content-form__footer">
       <a href="<?= $root ?>privacy-poilcy">Privacy Policy</a>
       <a href="<?= $root ?>terms-of-service">Terms of Service</a>
-      <a href="https://github.com/ev3rlord/kommenta" class="copyright" target="_blank">&copy; Kommenta <?= Date('Y') ?></a>
+      <a href="https://github.com/ev3rlord/kommentae" class="copyright" target="_blank">&copy; Kommentae <?= Date('Y') ?></a>
     </div>
   </div>
 </div>
