@@ -7,7 +7,7 @@
 
       <div class="kommenta">
         <div class="km-comment">
-          <div class="km-textarea km-comment__textarea" contenteditable="true" spellcheck="false"></div>
+          <textarea class="km-textarea km-comment__textarea" spellcheck="false"></textarea>
           <div class="km-comment-textarea--shade"></div>
           <div class="km-comment__perks">
             <div class="km-comment__bold"><i class="fa fa-bold" aria-hidden="true"></i></div>

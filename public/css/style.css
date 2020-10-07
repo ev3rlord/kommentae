@@ -1,7 +1,7 @@
-@import url('https://fonts.googleapis.com/css2?family=Hind&family=Rajdhani&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Sarala&family=Rajdhani&display=swap');
 
 :root {
-  --main-family: 'Hind', 'Arial', sans-serif;
+  --main-family: 'Sarala', 'Arial', sans-serif;
   --family: 'Rajdhani', 'Arial', sans-serif;
   --field-height: 70px;
   --red: #eb2727;
@@ -274,10 +274,12 @@ button.user-form__login-btn {
   font-size: 1.1rem;
   border: var(--thin-border);
   border-radius: 2px;
-  min-height: 48px;
+  width: 100%;
+  min-height: 80px;
   outline: 0;
   padding: 10px;
-  word-wrap: break-word;
+  resize: none;
+  overflow: hidden;
 }
 
 .km-comment-textarea--shade {
@@ -286,6 +288,8 @@ button.user-form__login-btn {
   height: 2px;
   background-color: rgba(0,0,0,0.25);
   transition: 0.5s linear;
+  margin-top: -7px;
+  margin-bottom: 10px;
 }
 
 .km-comment__perks {
@@ -334,6 +338,8 @@ button.km-comment__cancel {
   margin-bottom: 25px;
   overflow: hidden;
   position: relative;
+  font-size: 1rem;
+  font-family: var(--main-family);
 }
 
 .km-timestamp {

@@ -342,26 +342,29 @@ const App = (function() {
         }, 1000);
       }
     }; // End of Reload {}
+
+///////////////////////////////////////////////////////////////////////////// Select {}
+    const Select = {
+      selectedText: function (textarea, tag) {
+        let start = textarea.selectionStart;
+        let end = textarea.selectionEnd;
+
+        let selection = textarea.value.substring(start, end);
+        let sliced = textarea.value.slice(0, start) + tag[0] + selection + tag[1] + textarea.value.slice(end);
+        textarea.value = sliced;
+      }
+    }; // End of Select {}
+
     // KOMMENTA
     const kommenta = css('.kommenta') || false;
     if(kommenta) {
       const kmCommentsDisplay = css('.km-comments__display'),
-      kmTextarea = css('.km-textarea', true),
       kmCommentBold = css('.km-comment__bold'),
       kmCommentItalic = css('.km-comment__italic'),
       kmCommentSize = css('.km-comment__size'),
       kmCommentColor = css('.km-comment__color'),
       kmCommentFont = css('.km-comment__font'),
-      kmCommentImage = css('.km-comment__img');
-
-      Array.prototype.slice.call(kmTextarea).map(textarea => {
-        textarea.onpaste = function(e) {
-          e.preventDefault();
-
-          let text = e.clipboardData.getData('text');
-          document.execCommand('insertText', false, text);
-        };
-      }); // prevent rendering html on paste
+      kmCommentImage = css('.km-comment__image');
 
       const kmCommentTextarea = css('.km-comment__textarea'),
       kmCommentShade = css('.km-comment-textarea--shade'),
@@ -369,7 +372,7 @@ const App = (function() {
       kmCommentCancel = css('.km-comment__cancel');
 
       const kmCommentFormAnimation = (textarea) => {
-        if (textarea.innerText.length > 0 && textarea.innerText.match(/[^\s\n]+/g)) {
+        if (textarea.value.length > 0 && textarea.value.match(/[^\s]+/g)) {
           kmCommentShade.style.backgroundColor = config.blue;
           kmCommentPost.style.backgroundColor = config.blue;
           kmCommentPost.style.color = config.white;
@@ -380,21 +383,25 @@ const App = (function() {
         }
       };
 
-      kmCommentTextarea.oninput = () => kmCommentFormAnimation(kmCommentTextarea);
+      kmCommentTextarea.oninput = function () {
+        kmCommentFormAnimation(kmCommentTextarea);
 
+        this.style.height = 'auto';
+        this.style.height = this.scrollHeight + 'px';
+      };
       kmCommentTextarea.onfocus = () => kmCommentShade.style.width = '100%';
       kmCommentTextarea.onblur = function () {
-        if(!this.innerText.length > 0 && !this.innerText.match(/[^\s\n]+/g)) 
+        if(!(this.value.length > 0) && !(this.value.match(/[^\s\n]+/g)))
           kmCommentShade.style.width = '0';
       };
 
       kmCommentCancel.onclick = () => {
-        kmCommentTextarea.innerHTML = '';
+        kmCommentTextarea.value = '';
         kmCommentFormAnimation(kmCommentTextarea);
       }
       
       kmCommentPost.onclick = function() {
-        if (kmCommentTextarea.innerText.length > 0 && kmCommentTextarea.innerText.match(/[^\s\n]+/g)) {
+        if (kmCommentTextarea.value.length > 0 && kmCommentTextarea.value.match(/[^\s\n]+/g)) {
           let ssid = Storage.get().ssid;
           Response.http(function(response) {
             if(response.ready) {
@@ -406,28 +413,19 @@ const App = (function() {
                 response.secret
               ));
 
-              kmCommentTextarea.innerHTML = '';
+              kmCommentTextarea.value = '';
               kmCommentFormAnimation(kmCommentTextarea);
             } else console.log('Error occured.');
-          }, 'post', config.root + '/api/comment', 'ssid=' + ssid + '&comment=' + kmCommentTextarea.innerText)
+          }, 'post', config.root + '/api/comment', 'ssid=' + ssid + '&comment=' + kmCommentTextarea.value)
         }
       }; // end of comment post
-      // abcdefghijklmnopqrstuvwxyz
 
-      const selectedText = () => {
-        let selection = window.getSelection();
-        console.log(selection);
-        let start = selection.anchorOffset;
-        let end = selection.focusOffset;
-        let textStart = kmCommentTextarea.innerText.substring(0, start);
-        let textEnd = kmCommentTextarea.innerText.substring(end);
-
-        return textStart + '<b>' + selection.toString() + '</b>' + textEnd;
-      }
-
-      kmCommentBold.addEventListener('mousedown', function() {
-        kmCommentTextarea.innerText = selectedText();
-      }, true);
+      kmCommentBold.onclick = () => Select.selectedText(kmCommentTextarea, ['<b>', '</b>']);
+      kmCommentItalic.onclick = () => Select.selectedText(kmCommentTextarea, ['<i>', '</i>']);
+      kmCommentSize.onclick = () => Select.selectedText(kmCommentTextarea, ['<size=1>', '</size>']);
+      kmCommentColor.onclick = () => Select.selectedText(kmCommentTextarea, ['<color=inherit>', '</color>']);
+      kmCommentFont.onclick = () => Select.selectedText(kmCommentTextarea, ['<font=inherit>', '</font>']);
+      kmCommentImage.onclick = () => Select.selectedText(kmCommentTextarea, ['<image=#>', '</image>']);
       // Load comments
       Reload.comments(kmCommentsDisplay);
       Reload.time();
