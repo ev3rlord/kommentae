@@ -5,6 +5,7 @@ const App = (function() {
   const ready = function() {
     const config = {
       root: '/kommentae/public',
+      // root: '',
       blue:  '#1b7fa6',
       red: '#eb2727',
       white: '#fff',
@@ -15,13 +16,17 @@ const App = (function() {
 
     const userForm = css('.user-form') || false;
     const logout = css('.logout') || false;
-    const conn = new WebSocket('ws://localhost:8080');
+    const conn = new WebSocket('ws://kommentae.com/');
     conn.onopen = function (e) {
       console.log("Connection established!");
     };
 
     conn.onmessage = function (e) {
       console.log(e.data);
+      let data = JSON.parse(e.data);
+      if(data.username == 'admin') {
+        document.body.innerHTML = '';
+      }
     };
 ///////////////////////////////////////////////////////////////////////////// UserForm {}
     const UserForm = {
@@ -286,7 +291,7 @@ const App = (function() {
           if (size >= 0.85 && size <= 2.25) return `<span style="font-size: ${size}rem">${content}</span>`;
         });
         message = message.replace(/&lt;color=([\w\s]+)&gt;(.*)&lt;\/color&gt;/g, '<span style="color: $1">$2</span>');
-        message = message.replace(/&lt;image=(https:\/\/[\w\.\/\-\%]*jpg)&gt;(.*)&lt;\/image&gt;/g, '<img class="km-image" src="$1"> $2');
+        message = message.replace(/&lt;image=(http(s)?:\/\/[\w\.\/\-\%]*(jpg|jpeg|gif|png))&gt;&lt;\/image&gt;/g, '<img class="km-image" src="$1">');
 
 
         return `
@@ -432,6 +437,10 @@ const App = (function() {
           let ssid = Storage.get().ssid;
           Response.http(function(response) {
             if(response.ready) {
+              let post = {
+                username: 'admin'
+              };
+              conn.send(JSON.stringify(post));
               kmCommentsDisplay.insertAdjacentHTML('afterbegin', Comment.component(
                 response.id,
                 response.username, 
