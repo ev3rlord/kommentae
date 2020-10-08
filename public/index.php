@@ -39,12 +39,12 @@
         Don't have an account? <span>Signup</span>
       </div>
     </form>
+  </div>
 
-    <div class="content-form__footer">
-      <a href="<?= $root ?>privacy-policy">Privacy Policy</a>
-      <a href="<?= $root ?>terms-of-service">Terms of Service</a>
-      <a href="https://github.com/ev3rlord/kommentae" class="copyright" target="_blank">&copy; Kommentae <?= Date('Y') ?></a>
-    </div>
+  <div class="content-form-footer">
+    <a href="<?= $root ?>privacy-policy">Privacy Policy</a>
+    <a href="<?= $root ?>terms-of-service">Terms of Service</a>
+    <a href="https://github.com/ev3rlord/kommentae" class="copyright" target="_blank">&copy; Kommentae <?= Date('Y') ?></a>
   </div>
 </div>
 <?php } else require_once dirname(__DIR__) . '/includes/homepage.php'; ?>

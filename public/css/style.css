@@ -91,6 +91,10 @@ button:focus {
   padding: 0 10px;
 }
 
+.content-form {
+  height: calc(100vh - 25px);
+}
+
 .user-form {
   max-width: 360px;
   width: 95%;
@@ -221,19 +225,29 @@ button.user-form__login-btn {
   font-weight: bold;
 }
 
-.content-form__footer {
-  position: absolute;
-  bottom: 2.5px;
-  font-size: 0.85rem;
-  font-weight: bold;
+.content-form-footer {
+  text-align: center;
+  clear: both;
+  font-size: 0.75rem;
   color: var(--opaque-black);
   user-select: none;
+  max-width: 360px;
+  width: 90%;
+  margin: 0 auto;
 }
 
-.content-form__footer a {
-  margin-right: 10px;
+.content-form-footer a {
+  float: left;
   text-decoration: none;
   color: var(--opaque-black);
+}
+
+.content-form-footer a:nth-child(2) {
+  margin-left: 25px;
+}
+
+.content-form-footer .copyright {
+  float: right;
 }
 
 .logout {
@@ -329,7 +343,6 @@ button.user-form__login-btn {
   height: 2px;
   background-color: rgba(0,0,0,0.25);
   transition: 0.5s linear;
-  margin-top: -7px;
   margin-bottom: 10px;
 }
 

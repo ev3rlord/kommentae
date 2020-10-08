@@ -4,6 +4,7 @@ const App = (function() {
   const css = (el, bool = false) => bool ? document.querySelectorAll(el) : document.querySelector(el);
   const ready = function() {
     const config = {
+      connection: 'ws://localhost:8000',
       root: '/kommentae/public',
       // root: '',
       blue:  '#1b7fa6',
@@ -21,8 +22,7 @@ const App = (function() {
     const userForm = css('.user-form') || false;
     const logout = css('.logout') || false;
 
-    const url = 'ws://localhost:8080';
-    const conn = new WebSocket(url);
+    const conn = new WebSocket(config.connection);
     conn.onopen = function (e) {
       console.log("Connection established!");
     };
@@ -392,6 +392,9 @@ const App = (function() {
 ///////////////////////////////////////////////////////////////////////////// Select {}
     const Select = {
       selectedText: function (textarea, tag) {
+        textarea.style.height = 'auto';
+        textarea.style.height = textarea.scrollHeight + 'px';
+
         let start = textarea.selectionStart;
         let end = textarea.selectionEnd;
 
@@ -463,7 +466,7 @@ const App = (function() {
               kmCommentFormAnimation(kmCommentTextarea);
               Reload.images();
             } else console.log('Error occured.');
-          }, 'post', config.root + '/api/comment', 'ssid=' + ssid + '&comment=' + kmCommentTextarea.value)
+          }, 'post', config.root + '/api/comment', 'ssid=' + ssid + '&comment=' + kmCommentTextarea.value);
         }
       }; // end of comment post
 
