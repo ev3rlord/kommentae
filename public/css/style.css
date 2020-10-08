@@ -289,6 +289,8 @@ button.user-form__login-btn {
 }
 
 .km-modal img {
+  max-width: 100%;
+  max-height: 100%;
   animation-name: zoom;
   animation-duration: 0.5s;
 }
@@ -310,7 +312,7 @@ button.user-form__login-btn {
 
 .km-textarea {
   font-family: var(--main-family);
-  font-size: 1.1rem;
+  font-size: 1rem;
   border: var(--thin-border);
   border-radius: 2px;
   width: 100%;
@@ -407,16 +409,26 @@ button.km-comment__cancel {
 .km-footer {
   font-weight: bold;
   user-select: none;
+  font-family: var(--family);
 }
 
-.km-footer > span {
+.km-footer > span,
+.km-footer__group > div {
   font-size: 0.85rem;
   cursor: pointer;
   color: var(--opaque-black);
 }
 
-.km-reply {
+.km-footer__group {
   float: left;
+}
+
+.km-footer__group > div {
+  float: left;
+}
+
+.km-likes {
+  margin-right: 30px;
 }
 
 .km-report {

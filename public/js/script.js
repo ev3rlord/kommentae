@@ -14,9 +14,15 @@ const App = (function() {
       lightBlack: 'rgba(0,0,0,0.25)'
     };
 
+    // KOMMENTA
+    const kommenta = css('.kommenta') || false;
+    const kmCommentsDisplay = css('.km-comments__display') || false;
+
     const userForm = css('.user-form') || false;
     const logout = css('.logout') || false;
-    const conn = new WebSocket('ws://kommentae.com/');
+
+    const url = 'ws://localhost:8080';
+    const conn = new WebSocket(url);
     conn.onopen = function (e) {
       console.log("Connection established!");
     };
@@ -24,9 +30,14 @@ const App = (function() {
     conn.onmessage = function (e) {
       console.log(e.data);
       let data = JSON.parse(e.data);
-      if(data.username == 'admin') {
-        document.body.innerHTML = '';
-      }
+
+      kmCommentsDisplay.insertAdjacentHTML('afterbegin', Comment.component(
+        data.id,
+        data.username,
+        data.comment,
+        data.posted,
+        data.secret
+      ));
     };
 ///////////////////////////////////////////////////////////////////////////// UserForm {}
     const UserForm = {
@@ -78,7 +89,6 @@ const App = (function() {
         xhttp.onreadystatechange = function() {
           if(this.status === 200 && this.readyState === 4) {
             let response = this.responseText;
-            console.log(response);
 
             if(Response.isJSON(response)) {
               let data = JSON.parse(response);
@@ -285,13 +295,14 @@ const App = (function() {
       component: function(cid, username, message, posted, secret) {
         let time = Comment.time(posted);
 
-        message = message.replace(/&lt;b&gt;(.*)&lt;\/b&gt;/g, '<b>$1</b>');
-        message = message.replace(/&lt;i&gt;(.*)&lt;\/i&gt;/g, '<b>$1</b>');
-        message = message.replace(/&lt;size=([\d\.]+)&gt;(.*)&lt;\/size&gt;/g, function(_, size, content) {
+        message = message.replace(/&lt;b&gt;(.*)&lt;\/b&gt;/gi, '<b>$1</b>');
+        message = message.replace(/&lt;i&gt;(.*)&lt;\/i&gt;/gi, '<b>$1</b>');
+        message = message.replace(/&lt;size=([\d\.]+)&gt;(.*)&lt;\/size&gt;/gi, function(_, size, content) {
           if (size >= 0.85 && size <= 2.25) return `<span style="font-size: ${size}rem">${content}</span>`;
         });
-        message = message.replace(/&lt;color=([\w\s]+)&gt;(.*)&lt;\/color&gt;/g, '<span style="color: $1">$2</span>');
-        message = message.replace(/&lt;image=(http(s)?:\/\/[\w\.\/\-\%]*(jpg|jpeg|gif|png))&gt;&lt;\/image&gt;/g, '<img class="km-image" src="$1">');
+        message = message.replace(/&lt;color=(#?[\w\s]+)&gt;(.*)&lt;\/color&gt;/gi, '<span style="color: $1">$2</span>');
+        message = message.replace(/&lt;font=(#?[\w\s]+)&gt;(.*)&lt;\/font&gt;/gi, '<span style="font-family: $1">$2</span>');
+        message = message.replace(/&lt;image=(http(s)?:\/\/[\w\.\/\-\%]*(jpg|jpeg|gif|png))&gt;&lt;\/image&gt;/gi, '<img class="km-image" src="$1">');
 
 
         return `
@@ -300,7 +311,10 @@ const App = (function() {
             <div class="km-username km-comment__username">${username}</div>
             <div class="km-message km-comment__message">${message}</div>
             <footer class="km-footer km-comment__footer">
-              <span class="km-reply">Reply</span>
+              <div class="km-footer__group">
+                <div class="km-likes">Like <span class="km-likes__count"></span></div>
+                <div class="km-reply">Reply</div>
+              </div>
               <span class="km-report" data-secret="${secret}">Report</span>
             </footer>
             
@@ -388,10 +402,8 @@ const App = (function() {
     }; // End of Select {}
 
     // KOMMENTA
-    const kommenta = css('.kommenta') || false;
     if(kommenta) {
-      const kmCommentsDisplay = css('.km-comments__display'),
-      kmCommentBold = css('.km-comment__bold'),
+      const kmCommentBold = css('.km-comment__bold'),
       kmCommentItalic = css('.km-comment__italic'),
       kmCommentSize = css('.km-comment__size'),
       kmCommentColor = css('.km-comment__color'),
@@ -438,16 +450,14 @@ const App = (function() {
           Response.http(function(response) {
             if(response.ready) {
               let post = {
-                username: 'admin'
+                id: response.id,
+                username: response.username,
+                comment: response.comment,
+                posted: response.posted,
+                secret: response.secret,
               };
+
               conn.send(JSON.stringify(post));
-              kmCommentsDisplay.insertAdjacentHTML('afterbegin', Comment.component(
-                response.id,
-                response.username, 
-                response.comment,
-                response.posted,
-                response.secret
-              ));
 
               kmCommentTextarea.value = '';
               kmCommentFormAnimation(kmCommentTextarea);
@@ -462,7 +472,7 @@ const App = (function() {
       kmCommentSize.onclick = () => Select.selectedText(kmCommentTextarea, ['<size=1>', '</size>']);
       kmCommentColor.onclick = () => Select.selectedText(kmCommentTextarea, ['<color=inherit>', '</color>']);
       kmCommentFont.onclick = () => Select.selectedText(kmCommentTextarea, ['<font=inherit>', '</font>']);
-      kmCommentImage.onclick = () => Select.selectedText(kmCommentTextarea, ['<image=#>', '</image>']);
+      kmCommentImage.onclick = () => Select.selectedText(kmCommentTextarea, ['<image=', '></image>']);
       // Load comments
       Reload.comments(kmCommentsDisplay);
       Reload.time();
