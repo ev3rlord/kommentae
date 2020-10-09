@@ -3,6 +3,7 @@ require_once __DIR__ . '/DB.php';
 
 class User extends DB {
   public static $path = '/kommentae/public/';
+  // public static $path = '/';
   private static $username;
   private static $ssid;
 

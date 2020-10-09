@@ -4,9 +4,9 @@ const App = (function() {
   const css = (el, bool = false) => bool ? document.querySelectorAll(el) : document.querySelector(el);
   const ready = function() {
     const config = {
-      connection: 'ws://localhost:8000',
+      // connection: 'ws://kommentae:8080',
       root: '/kommentae/public',
-      // root: '',
+      root: '',
       blue:  '#1b7fa6',
       red: '#eb2727',
       white: '#fff',
@@ -38,6 +38,8 @@ const App = (function() {
         data.posted,
         data.secret
       ));
+
+      Reload.images();
     };
 ///////////////////////////////////////////////////////////////////////////// UserForm {}
     const UserForm = {
@@ -292,18 +294,27 @@ const App = (function() {
         return time;
       },
 
+      decode: function(message) {
+        let codes = [
+          [/&lt;b&gt;(.*)&lt;\/b&gt;/gi, '<b>$1</b>'],
+          [/&lt;i&gt;(.*)&lt;\/i&gt;/gi, '<b>$1</b>'],
+          [/&lt;color=(#?[\w\s]+)&gt;(.*)&lt;\/color&gt;/gi, '<span style="color: $1">$2</span>'],
+          [/&lt;font=(#?[\w\s]+)&gt;(.*)&lt;\/font&gt;/gi, '<span style="font-family: $1">$2</span>'],
+          [/&lt;size=([\d\.]+)&gt;(.*)&lt;\/size&gt;/gi, (_, size, content) => {
+            if (size >= 0.85 && size <= 2.25) return `<span style="font-size: ${size}rem">${content}</span>`;
+          }],
+          [/&lt;image=(http(s)?:\/\/[\w\.\/\-\%]*(jpg|jpeg|gif|png))&gt;&lt;\/image&gt;/gi, '<img class="km-image" src="$1">']
+        ];
+        
+        for(let i = 0; i < codes.length; i++) 
+          message = message.replace(codes[i][0], codes[i][1]);
+        
+        return message;
+      },
+
       component: function(cid, username, message, posted, secret) {
         let time = Comment.time(posted);
-
-        message = message.replace(/&lt;b&gt;(.*)&lt;\/b&gt;/gi, '<b>$1</b>');
-        message = message.replace(/&lt;i&gt;(.*)&lt;\/i&gt;/gi, '<b>$1</b>');
-        message = message.replace(/&lt;size=([\d\.]+)&gt;(.*)&lt;\/size&gt;/gi, function(_, size, content) {
-          if (size >= 0.85 && size <= 2.25) return `<span style="font-size: ${size}rem">${content}</span>`;
-        });
-        message = message.replace(/&lt;color=(#?[\w\s]+)&gt;(.*)&lt;\/color&gt;/gi, '<span style="color: $1">$2</span>');
-        message = message.replace(/&lt;font=(#?[\w\s]+)&gt;(.*)&lt;\/font&gt;/gi, '<span style="font-family: $1">$2</span>');
-        message = message.replace(/&lt;image=(http(s)?:\/\/[\w\.\/\-\%]*(jpg|jpeg|gif|png))&gt;&lt;\/image&gt;/gi, '<img class="km-image" src="$1">');
-
+        message = Comment.decode(message);
 
         return `
           <section class="km-block km-comment__block" data-postid="${cid}">
@@ -350,7 +361,6 @@ const App = (function() {
           Comment.images = css('.km-image', true) || false;
           Array.prototype.slice.call(Comment.images).map(image => {
             image.onclick = function () {
-              console.log('Clicked');
               modal.style.display = 'flex';
               modal.children[1].src = this.src;
             };
@@ -464,7 +474,6 @@ const App = (function() {
 
               kmCommentTextarea.value = '';
               kmCommentFormAnimation(kmCommentTextarea);
-              Reload.images();
             } else console.log('Error occured.');
           }, 'post', config.root + '/api/comment', 'ssid=' + ssid + '&comment=' + kmCommentTextarea.value);
         }
@@ -490,4 +499,4 @@ const App = (function() {
   return { ready };
 })();
 
-window.onload = () => App.ready();
+window.addEventListener('DOMContentLoaded', () => App.ready(), false);
