@@ -49,4 +49,20 @@ class Comment extends DB {
 
     return json_encode($json);
   }
+
+  public static function get_comment($id) {
+    $json = (object)[];
+    $json->ready = false;
+    
+    $sql = 'SELECT * FROM comments WHERE id > :id';
+    if(self::query($sql, [':id' > $id])) {
+      $json->data = self::query($sql, [
+        ':id' => $id
+      ], true);
+      $json->ready = true;
+    }
+
+    return json_encode($json);
+
+  }
 }

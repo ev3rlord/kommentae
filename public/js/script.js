@@ -4,9 +4,10 @@ const App = (function() {
   const css = (el, bool = false) => bool ? document.querySelectorAll(el) : document.querySelector(el);
   const ready = function() {
     const config = {
-      // connection: 'ws://kommentae:8080',
+      // root: '',
       root: '/kommentae/public',
-      root: '',
+      // connection: 'wss://echo.websocket.org/',
+      connection: 'ws://localhost:9000',
       blue:  '#1b7fa6',
       red: '#eb2727',
       white: '#fff',
@@ -31,15 +32,15 @@ const App = (function() {
       console.log(e.data);
       let data = JSON.parse(e.data);
 
-      kmCommentsDisplay.insertAdjacentHTML('afterbegin', Comment.component(
-        data.id,
-        data.username,
-        data.comment,
-        data.posted,
-        data.secret
-      ));
+      // kmCommentsDisplay.insertAdjacentHTML('afterbegin', Comment.component(
+      //   data.id,
+      //   data.username,
+      //   data.comment,
+      //   data.posted,
+      //   data.secret
+      // ));
 
-      Reload.images();
+      // Reload.images();
     };
 ///////////////////////////////////////////////////////////////////////////// UserForm {}
     const UserForm = {
@@ -386,6 +387,24 @@ const App = (function() {
         }, 'get', config.root + '/api/comment?comments=all&ssid=' + Storage.get().ssid);
       },
 
+      recent: function (display, postid) {
+        Response.http(function (response) {
+          if (response.ready) {
+            for (let i = 0; i < response.data.length; i++) {
+              display.insertAdjacentHTML('afterbegin', Comment.component(
+                response.data[i].id,
+                response.data[i].username,
+                response.data[i].comment,
+                response.data[i].posted,
+                response.data[i].secret
+              ));
+            }
+
+            Reload.images();
+          }
+        }, 'get', config.root + '/api/comment?id=' + postid);
+      },
+
       time: function() {
         setInterval(function() {
           kmTimestamps = css('.km-timestamp', true);
@@ -456,6 +475,13 @@ const App = (function() {
         kmCommentTextarea.value = '';
         kmCommentFormAnimation(kmCommentTextarea);
       }
+
+      setInterval(function() {
+        let postid = kmCommentsDisplay.children[0].dataset.postid;
+        Reload.recent(kmCommentsDisplay, postid);
+      }, 1000);
+
+
       
       kmCommentPost.onclick = function() {
         if (kmCommentTextarea.value.length > 0 && kmCommentTextarea.value.match(/[^\s\n]+/g)) {
@@ -470,7 +496,17 @@ const App = (function() {
                 secret: response.secret,
               };
 
-              conn.send(JSON.stringify(post));
+              kmCommentsDisplay.insertAdjacentHTML('afterbegin', Comment.component(
+                post.id,
+                post.username,
+                post.comment,
+                post.posted,
+                post.secret
+              ));
+
+              Reload.images();
+
+              // conn.send(JSON.stringify(post));
 
               kmCommentTextarea.value = '';
               kmCommentFormAnimation(kmCommentTextarea);

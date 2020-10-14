@@ -1,3 +1,4 @@
 vendor
 SECRET
 composer.lock
+public/php.php
